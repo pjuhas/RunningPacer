@@ -4,6 +4,7 @@
     package="sk.upjs.vma.runningpacer">
 
     <application
+        android:name=".TrainingPaceApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -14,7 +15,7 @@
         android:theme="@style/Theme.RunningPacer"
         >
         <activity
-            android:name=".MainActivity"
+            android:name=".feature_vdot.presentation.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.RunningPacer">
             <intent-filter>

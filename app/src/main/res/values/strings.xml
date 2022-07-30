@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Running Pacer</string>
+    <string name="bottom_navigation_home">VDOT</string>
+    <string name="bottom_navigation_profile">Stats</string>
 </resources>
