@@ -36,6 +36,7 @@ class TrainingPacesViewModel @Inject constructor(
                 }
                 getTrainingPaces(event.trainingPaceOrder)
             }
+
         }
     }
 
