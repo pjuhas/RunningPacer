@@ -30,8 +30,6 @@ fun AddRunScreen(
 ) {
 
     val scope = rememberCoroutineScope()
-    val difficultyState = viewModel.runDifficulty.value
-    val distanceState = viewModel.runDistance.value
 
     var textDistance by rememberSaveable { mutableStateOf("") }
     var textHHTime by rememberSaveable { mutableStateOf("") }
@@ -39,7 +37,7 @@ fun AddRunScreen(
     var textSSTime by rememberSaveable { mutableStateOf("") }
     var textPace by rememberSaveable { mutableStateOf("") }
 
-    var pickedDistance by rememberSaveable { mutableStateOf(TrainingPace.length[0]) }
+    var pickedDistance by rememberSaveable { mutableStateOf(TrainingPace.metricType[0]) }
     var expandedDistance by remember { mutableStateOf(false) }
 
     var pickedDifficulty by rememberSaveable { mutableStateOf(TrainingPace.difficulties[0]) }
@@ -129,7 +127,7 @@ fun AddRunScreen(
                         value = textDistance,
                         onValueChange = {
                             textDistance = it
-                            viewModel.onEvent(AddRunEvent.RunDistance(textDistance))
+                            viewModel.onEvent(AddRunEvent.RunDistance(textDistance.replace(",", ".")))
                             textPace = viewModel.runPace.value.text
                         },
                         placeholder = { Text("Fill") },
@@ -155,7 +153,7 @@ fun AddRunScreen(
                             expanded = expandedDistance,
                             onDismissRequest = { expandedDistance = false },
                         ) {
-                            TrainingPace.length.forEach { selectionOption ->
+                            TrainingPace.metricType.forEach { selectionOption ->
                                 DropdownMenuItem(
                                     text = { Text(selectionOption) },
                                     onClick = {
@@ -189,7 +187,7 @@ fun AddRunScreen(
                         },
                         placeholder = { Text("hh") },
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
                     )
                     Spacer(modifier = Modifier.width(5.dp))
                     TextField(
@@ -203,7 +201,7 @@ fun AddRunScreen(
                         },
                         placeholder = { Text("mm") },
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
                     )
                     Spacer(modifier = Modifier.width(5.dp))
                     TextField(
@@ -217,7 +215,7 @@ fun AddRunScreen(
                         },
                         placeholder = { Text("ss") },
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
                     )
                 }
                 Spacer(modifier = Modifier.height(100.dp))

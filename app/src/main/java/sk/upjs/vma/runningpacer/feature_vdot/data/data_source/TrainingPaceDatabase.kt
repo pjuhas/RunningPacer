@@ -7,9 +7,9 @@ import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TrainingPace
 
 @Database(
     entities = [TrainingPace::class],
-    version = 4,
+    version = 2,
     exportSchema = true,
-    autoMigrations = [AutoMigration (from = 3, to = 4)]
+    autoMigrations = [AutoMigration (from = 1, to = 2)]
 )
 abstract class TrainingPaceDatabase : RoomDatabase() {
 

@@ -8,7 +8,6 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import sk.upjs.vma.runningpacer.common.presentation.BottomNavGraph
 import sk.upjs.vma.runningpacer.common.presentation.Screen
@@ -27,7 +26,7 @@ fun MainScreen() {
 @Composable
 fun BottomBar(navController: NavHostController) {
     val screens = listOf(
-        Screen.Vdot,
+        Screen.Calculate,
         Screen.Profile
     )
     val navBackStackEntry by navController.currentBackStackEntryAsState()

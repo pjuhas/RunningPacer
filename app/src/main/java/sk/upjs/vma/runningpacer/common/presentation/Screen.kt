@@ -10,18 +10,17 @@ sealed class Screen(val route: String,
                     val title: String,
                     val icon: ImageVector
 ) {
-    object Vdot : Screen(
+    object Calculate : Screen(
         route = "calculate",
         title = "Calculate",
         icon = Icons.Default.Calculate
     )
-
     object Profile : Screen(
         route = "profile",
         title = "Profile",
         icon = Icons.Default.Person
     )
-    object addRun : Screen(
+    object AddRun : Screen(
         route = "addRun",
         title = "Add run",
         icon = Icons.Default.Add

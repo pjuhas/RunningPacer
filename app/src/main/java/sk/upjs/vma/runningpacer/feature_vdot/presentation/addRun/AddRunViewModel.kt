@@ -43,11 +43,12 @@ class AddRunViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    private var totalTime: Int = 0
     private var currentNoteId: Int? = null
 
 
     fun onEvent(event: AddRunEvent) {
-        when(event) {
+        when (event) {
             is AddRunEvent.RunDifficulty -> {
                 _addRunDifficulty.value = _addRunDifficulty.value.copy(
                     text = event.value
@@ -93,7 +94,7 @@ class AddRunViewModel @Inject constructor(
                             TrainingPace(
                                 difficulty = runDifficulty.value.text,
                                 distanceType = pickedDistance.value.text,
-                                distance =  Integer.parseInt(runDistance.value.text),
+                                distance = runDistance.value.text.toDouble(),
                                 /*
                                 when(pickedDistance.value.text) {
                                     "mile" -> { Integer.parseInt(runDistance.value.text) * 1000 }
@@ -101,16 +102,14 @@ class AddRunViewModel @Inject constructor(
                                     else -> { Integer.parseInt(runDistance.value.text)}
                                 },
                                 */
-                                time = (runTimeHH.value.text.toIntOrNull()?:0) * 60 * 60 +
-                                        (runTimeMM.value.text.toIntOrNull()?:0) * 60 +
-                                        (runTimeSS.value.text.toIntOrNull()?:0),
+                                time = totalTime,
                                 pace = runPace.value.text,
                                 timestamp = System.currentTimeMillis(),
                                 id = currentNoteId
                             )
                         )
                         _eventFlow.emit(UiEvent.SaveNote)
-                    } catch(e: Exception) {
+                    } catch (e: Exception) {
                         _eventFlow.emit(
                             UiEvent.ShowSnackbar(
                                 message = e.message ?: "Couldn't save note"
@@ -124,13 +123,23 @@ class AddRunViewModel @Inject constructor(
 
     private fun calculatePace() {
         viewModelScope.launch {
-            val pace = trainingPaceUseCases.calculatePace(runDistance.value.text, pickedDistance.value.text, runTimeSS.value.text, runTimeMM.value.text, runTimeHH.value.text)
+            totalTime = trainingPaceUseCases.regularTimeToSec(
+                runTimeSS.value.text,
+                runTimeMM.value.text,
+                runTimeHH.value.text
+            )
+
+            val pace = trainingPaceUseCases.calculatePace(
+                runDistance.value.text,
+                pickedDistance.value.text,
+                totalTime,
+            )
             _addRunPace.value.text = pace
         }
     }
 
     sealed class UiEvent {
-        data class ShowSnackbar(val message: String): UiEvent()
-        object SaveNote: UiEvent()
+        data class ShowSnackbar(val message: String) : UiEvent()
+        object SaveNote : UiEvent()
     }
 }

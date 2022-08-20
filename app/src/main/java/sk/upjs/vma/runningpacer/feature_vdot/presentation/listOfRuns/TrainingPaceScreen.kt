@@ -26,7 +26,7 @@ fun TrainingPaceScreen(
 ) {
     val state = viewModel.state.value
     val snackbarHostState = remember { SnackbarHostState() }
-    val scrollState = rememberTopAppBarState()
+
     val scope = rememberCoroutineScope()
 
 
@@ -35,7 +35,6 @@ fun TrainingPaceScreen(
         topBar = {
             SmallTopAppBar(
                 title = { Text("Times & Paces") },
-                //scrollBehavior = ,
                 actions = {
                     IconButton(onClick = {
                         /*TODO*/
@@ -64,7 +63,7 @@ fun TrainingPaceScreen(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.inverseOnSurface,
                 onClick = {
-                    navController.navigate(Screen.addRun.route) {
+                    navController.navigate(Screen.AddRun.route) {
                         popUpTo(navController.graph.findStartDestination().id) {
                             saveState = true
                         }
