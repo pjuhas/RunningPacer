@@ -10,6 +10,7 @@ import sk.upjs.vma.runningpacer.feature_vdot.data.data_source.TrainingPaceDataba
 import sk.upjs.vma.runningpacer.feature_vdot.data.repository.TrainingPaceImpl
 import sk.upjs.vma.runningpacer.feature_vdot.domain.repository.TrainingPaceRepository
 import sk.upjs.vma.runningpacer.feature_vdot.domain.use_case.AddTrainingPace
+import sk.upjs.vma.runningpacer.feature_vdot.domain.use_case.CalcutatePace
 import sk.upjs.vma.runningpacer.feature_vdot.domain.use_case.GetTrainingPaces
 import sk.upjs.vma.runningpacer.feature_vdot.domain.use_case.TrainingPaceUseCases
 import javax.inject.Singleton
@@ -37,7 +38,8 @@ object AppModule {
     fun provideTrainingPaceUseCases(repository: TrainingPaceRepository) : TrainingPaceUseCases {
         return TrainingPaceUseCases(
             getTrainingPaces = GetTrainingPaces(repository),
-            addTrainingPace = AddTrainingPace(repository)
+            addTrainingPace = AddTrainingPace(repository),
+            calculatePace = CalcutatePace()
         )
     }
 }

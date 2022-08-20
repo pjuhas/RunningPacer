@@ -9,13 +9,14 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import sk.upjs.vma.runningpacer.common.presentation.BottomNavGraph
 import sk.upjs.vma.runningpacer.common.presentation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun MainScreen() {
-    val navController = rememberNavController()
+    val navController = rememberAnimatedNavController()
     Scaffold(
         bottomBar = { BottomBar(navController = navController) }
     ) {

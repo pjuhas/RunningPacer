@@ -1,13 +1,15 @@
 package sk.upjs.vma.runningpacer.feature_vdot.data.data_source
 
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TrainingPace
 
 @Database(
     entities = [TrainingPace::class],
-    version = 1,
-    exportSchema = false
+    version = 4,
+    exportSchema = true,
+    autoMigrations = [AutoMigration (from = 3, to = 4)]
 )
 abstract class TrainingPaceDatabase : RoomDatabase() {
 

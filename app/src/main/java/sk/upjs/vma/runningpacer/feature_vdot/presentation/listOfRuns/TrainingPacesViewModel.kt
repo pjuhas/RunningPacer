@@ -1,4 +1,4 @@
-package sk.upjs.vma.runningpacer.feature_vdot.presentation.vdot
+package sk.upjs.vma.runningpacer.feature_vdot.presentation.listOfRuns
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
