@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -44,6 +45,7 @@ class AddRunViewModel @Inject constructor(
 
     private var totalTime: Int = 0
     private var currentNoteId: Int? = null
+    private var addTrainingJob: Job? = null
 
 
     fun onEvent(event: AddRunEvent) {
@@ -78,10 +80,16 @@ class AddRunViewModel @Inject constructor(
                             TrainingPace(
                                 difficulty = runDifficulty.value,
                                 distanceType = pickedDistance.value,
-                                distance =  when(pickedDistance.value) {
-                                    MetricTypeEnum.KILOMETERS.type -> { runDistance.value.toDouble() * 1000 }
-                                    MetricTypeEnum.MILES.type -> { runDistance.value.toDouble() * 1609.344 }
-                                    else -> {runDistance.value.toDouble()}
+                                distance = when (pickedDistance.value) {
+                                    MetricTypeEnum.KILOMETERS.type -> {
+                                        runDistance.value.toDouble() * 1000
+                                    }
+                                    MetricTypeEnum.MILES.type -> {
+                                        runDistance.value.toDouble() * 1609.344
+                                    }
+                                    else -> {
+                                        runDistance.value.toDouble()
+                                    }
                                 },
                                 time = totalTime,
                                 pace = runPace.value,
@@ -90,10 +98,10 @@ class AddRunViewModel @Inject constructor(
                             )
                         )
                         _eventFlow.emit(UiEvent.SaveNote)
-                                } catch (e: Exception) {
+                    } catch (e: Exception) {
                         _eventFlow.emit(
                             UiEvent.ShowSnack(
-                                message = e.message ?: "Couldn't save note"
+                                message = "Couldn't save training - Fill out the form"
                             )
                         )
                     }
@@ -103,7 +111,8 @@ class AddRunViewModel @Inject constructor(
     }
 
     private fun calculatePace() {
-        viewModelScope.launch {
+        addTrainingJob?.cancel()
+        addTrainingJob = viewModelScope.launch {
             totalTime = trainingPaceUseCases.regularTimeToSec(
                 runTimeSS.value,
                 runTimeMM.value,

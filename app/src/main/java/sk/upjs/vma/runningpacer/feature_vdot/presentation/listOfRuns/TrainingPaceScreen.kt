@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import kotlinx.coroutines.launch
 import sk.upjs.vma.runningpacer.common.enum.OrderByEnum
 import sk.upjs.vma.runningpacer.common.enum.OrderTypeEnum
 import sk.upjs.vma.runningpacer.common.presentation.Screen
@@ -32,9 +33,8 @@ fun TrainingPaceScreen(
     viewModel: TrainingPacesViewModel = hiltViewModel()
 ) {
     val state = viewModel.state.value
-    val snackHostState = remember { SnackbarHostState() }
+    remember { SnackbarHostState() }
 
-    val scope = rememberCoroutineScope()
     OrderByEnum.values().forEach { it ->
         if (it == OrderByEnum.DATE) {
             it.mutableState = rememberSaveable { mutableStateOf(true) }
@@ -81,7 +81,6 @@ fun TrainingPaceScreen(
                     }
                 }
             },
-            snackbarHost = { SnackbarHost(snackHostState) },
             floatingActionButton = {
                 FloatingActionButton(
                     containerColor = MaterialTheme.colorScheme.primary,

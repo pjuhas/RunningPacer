@@ -6,16 +6,14 @@ import sk.upjs.vma.runningpacer.common.enum.MetricTypeEnum
 
 class CalculatePace() {
 
-    @Throws(InvalidTrainingPaceException::class)
     operator fun invoke(
         runDistance: String,
         runMetrics: String,
         totalTime: Int
     ): String {
         if (runDistance.isEmpty() || runMetrics.isEmpty() || runDistance.toDoubleOrNull() == null) {
-            return ""
+            return "Fill out distance and metrics"
         }
-
         when (runMetrics) {
             MetricTypeEnum.METERS.type -> {
                 return minPerMetric(
@@ -24,12 +22,14 @@ class CalculatePace() {
                 )
             }
             MetricTypeEnum.KILOMETERS.type -> {
-                return minPerMetric(totalTime / runDistance.toDouble(), MetricTypeEnum.KILOMETERS.alias)
+                return minPerMetric(
+                    totalTime / runDistance.toDouble(),
+                    MetricTypeEnum.KILOMETERS.alias
+                )
             }
             MetricTypeEnum.MILES.type -> {
                 return minPerMetric(totalTime / runDistance.toDouble(), MetricTypeEnum.MILES.alias)
             }
-
         }
         return "Calculating"
     }

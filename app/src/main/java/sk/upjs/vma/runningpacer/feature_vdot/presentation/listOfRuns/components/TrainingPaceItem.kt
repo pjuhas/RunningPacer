@@ -22,7 +22,7 @@ fun TrainingPaceItem(
     trainingPace: TrainingPace,
     modifier: Modifier = Modifier
 ) {
-    val listOfValues = listOf("Difficulty :", "Distance :", "Time :", "Pace :",)
+    val listOfValues = listOf("Difficulty :", "Distance :", "Time :", "Pace :")
 
     Card(
         modifier = modifier, colors = CardDefaults.cardColors(
@@ -73,10 +73,16 @@ fun TrainingPaceItem(
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = when (trainingPace.distanceType) {
-                            MetricTypeEnum.KILOMETERS.type -> { trainingPace.distance / 1000 }
-                            MetricTypeEnum.MILES.type -> { trainingPace.distance / 1609.344 }
-                            else -> {trainingPace.distance}
-                        } .toString() + " %s".format(trainingPace.distanceType),
+                            MetricTypeEnum.KILOMETERS.type -> {
+                                trainingPace.distance / 1000
+                            }
+                            MetricTypeEnum.MILES.type -> {
+                                trainingPace.distance / 1609.344
+                            }
+                            else -> {
+                                trainingPace.distance
+                            }
+                        }.toString() + " %s".format(trainingPace.distanceType),
 
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface,

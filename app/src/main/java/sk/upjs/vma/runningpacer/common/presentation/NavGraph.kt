@@ -30,7 +30,7 @@ fun BottomNavGraph(navController: NavHostController) {
         composable(route = Screen.Calculate.route, enterTransition = {
             when (initialState.destination.route) {
                 Screen.Profile.route -> slideInHorizontally(
-                    initialOffsetX = { -1000 }, // small slide 300px
+                    initialOffsetX = { -1000 },
                     animationSpec = tweenSpec
                 )
                 else -> {
@@ -41,7 +41,7 @@ fun BottomNavGraph(navController: NavHostController) {
             exitTransition = {
                 when (targetState.destination.route) {
                     Screen.Profile.route -> slideOutHorizontally(
-                        targetOffsetX = { -1000 }, // small slide 300px
+                        targetOffsetX = { -1000 },
                         animationSpec = tweenSpec
                     )
                     else -> {
@@ -55,7 +55,7 @@ fun BottomNavGraph(navController: NavHostController) {
             enterTransition = {
                 when (initialState.destination.route) {
                     Screen.Calculate.route -> slideInHorizontally(
-                        initialOffsetX = { 1000 }, // small slide 300px
+                        initialOffsetX = { 1000 },
                         animationSpec = tweenSpec
                     )
                     else -> {
@@ -66,7 +66,7 @@ fun BottomNavGraph(navController: NavHostController) {
             exitTransition = {
                 when (targetState.destination.route) {
                     Screen.Calculate.route -> slideOutHorizontally(
-                        targetOffsetX = { 1000 }, // small slide 300px
+                        targetOffsetX = { 1000 },
                         animationSpec = tweenSpec
                     )
                     else -> {

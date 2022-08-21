@@ -5,4 +5,4 @@ data class TrainingPaceUseCases(
     val addTrainingPace: AddTrainingPace,
     val calculatePace: CalculatePace,
     val regularTimeToSec: RegularTimeToSec
-    )
+)

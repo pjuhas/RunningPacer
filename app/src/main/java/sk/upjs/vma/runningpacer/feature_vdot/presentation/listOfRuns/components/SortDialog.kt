@@ -112,7 +112,8 @@ fun SortDialog(
                     ) {
                         TextButton(onClick = { openDialog.value = false }) { Text("Cancel") }
                         TextButton(onClick = {
-                            val type = OrderTypeEnum.values().firstOrNull { it.mutableState!!.value }
+                            val type =
+                                OrderTypeEnum.values().firstOrNull { it.mutableState!!.value }
                             val order = OrderByEnum.values().firstOrNull { it.mutableState!!.value }
 
                             if (type != null && order != null) {

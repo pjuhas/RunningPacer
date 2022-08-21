@@ -15,11 +15,11 @@ data class TrainingPace(
     @ColumnInfo(defaultValue = "") var pace: String = "",
     var timestamp: Long = 0L,
     @PrimaryKey(autoGenerate = true) var id: Int? = null
-){
+) {
     companion object {
         val metricType = MetricTypeEnum.values().map { it.type }
         val difficulties = RunDifficultyEnum.values().map { it.type }
     }
 }
 
-class InvalidTrainingPaceException(message: String): Exception(message)
+class InvalidTrainingPaceException(message: String) : Exception(message)

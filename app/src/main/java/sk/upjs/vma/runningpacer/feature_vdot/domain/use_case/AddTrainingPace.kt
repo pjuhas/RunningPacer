@@ -7,8 +7,8 @@ import sk.upjs.vma.runningpacer.feature_vdot.domain.repository.TrainingPaceRepos
 class AddTrainingPace(private val repository: TrainingPaceRepository) {
 
     @Throws(InvalidTrainingPaceException::class)
-    suspend operator fun invoke(trainingPace: TrainingPace){
-        if (trainingPace.difficulty.isBlank()){
+    suspend operator fun invoke(trainingPace: TrainingPace) {
+        if (trainingPace.difficulty.isBlank()) {
             throw InvalidTrainingPaceException("Empty values")
         }
         repository.insertTrainingPace(trainingPace)

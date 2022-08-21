@@ -18,21 +18,23 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideTrainingPaceDatabase(app: Application) : TrainingPaceDatabase {
-        return Room.databaseBuilder(app,
+    fun provideTrainingPaceDatabase(app: Application): TrainingPaceDatabase {
+        return Room.databaseBuilder(
+            app,
             TrainingPaceDatabase::class.java,
-            TrainingPaceDatabase.DATABASE_NAME).build()
+            TrainingPaceDatabase.DATABASE_NAME
+        ).build()
     }
 
     @Provides
     @Singleton
-    fun provideTrainingPaceRepository(db: TrainingPaceDatabase) : TrainingPaceRepository {
+    fun provideTrainingPaceRepository(db: TrainingPaceDatabase): TrainingPaceRepository {
         return TrainingPaceImpl(db.trainingPaceDao)
     }
 
     @Provides
     @Singleton
-    fun provideTrainingPaceUseCases(repository: TrainingPaceRepository) : TrainingPaceUseCases {
+    fun provideTrainingPaceUseCases(repository: TrainingPaceRepository): TrainingPaceUseCases {
         return TrainingPaceUseCases(
             getTrainingPaces = GetTrainingPaces(repository),
             addTrainingPace = AddTrainingPace(repository),

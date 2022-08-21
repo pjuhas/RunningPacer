@@ -24,6 +24,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import sk.upjs.vma.runningpacer.common.presentation.Screen
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TrainingPace
 
@@ -32,10 +33,10 @@ import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TrainingPace
 fun AddRunScreen(
     navController: NavController,
     viewModel: AddRunViewModel = hiltViewModel(),
-
-    ) {
+) {
 
     val scope = rememberCoroutineScope()
+    val snackHostState = remember { SnackbarHostState() }
 
     var textDistance by rememberSaveable { mutableStateOf("") }
     var textHHTime by rememberSaveable { mutableStateOf("") }
@@ -56,7 +57,9 @@ fun AddRunScreen(
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
                 is AddRunViewModel.UiEvent.ShowSnack -> {
-                    TODO()
+                    scope.launch {
+                        snackHostState.showSnackbar(event.message)
+                    }
                 }
                 is AddRunViewModel.UiEvent.SaveNote -> {
                     navController.navigateUp()
@@ -71,6 +74,7 @@ fun AddRunScreen(
                 title = { Text("Add your run") }
             )
         },
+        snackbarHost = { SnackbarHost(snackHostState) },
         content = { innerPadding ->
             Column(
                 modifier = Modifier

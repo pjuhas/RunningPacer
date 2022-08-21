@@ -14,16 +14,16 @@ class GetTrainingPaces(private val repository: TrainingPaceRepository) {
         orderBy: OrderByEnum = OrderByEnum.DATE
     ): Flow<List<TrainingPace>> {
         return repository.getTrainingPaces().map { trainingPaces ->
-            when (orderType){
+            when (orderType) {
                 OrderTypeEnum.ASCENDING -> {
-                    when (orderBy){
+                    when (orderBy) {
                         OrderByEnum.DISTANCE -> trainingPaces.sortedBy { it.distance }
                         OrderByEnum.DATE -> trainingPaces.sortedBy { it.timestamp }
                         OrderByEnum.TIME -> trainingPaces.sortedBy { it.time }
                     }
                 }
                 OrderTypeEnum.DESCENDING -> {
-                    when (orderBy){
+                    when (orderBy) {
                         OrderByEnum.DISTANCE -> trainingPaces.sortedByDescending { it.distance }
                         OrderByEnum.DATE -> trainingPaces.sortedByDescending { it.timestamp }
                         OrderByEnum.TIME -> trainingPaces.sortedByDescending { it.time }
