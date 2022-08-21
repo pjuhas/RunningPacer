@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import sk.upjs.vma.runningpacer.common.enum.MetricTypeEnum
+import sk.upjs.vma.runningpacer.common.enum.RunDifficultyEnum
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TrainingPace
 import java.text.SimpleDateFormat
 import java.util.*
@@ -20,6 +22,8 @@ fun TrainingPaceItem(
     trainingPace: TrainingPace,
     modifier: Modifier = Modifier
 ) {
+    val listOfValues = listOf("Difficulty :", "Distance :", "Time :", "Pace :",)
+
     Card(
         modifier = modifier, colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -48,33 +52,15 @@ fun TrainingPaceItem(
             Spacer(modifier = Modifier.height(4.dp))
             Row {
                 Column {
-                    Text(
-                        text = "Difficulty :",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = "Distance :",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = "Time :",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text(
-                        text = "Pace :",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    listOfValues.forEach {
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                    }
                 }
                 Spacer(modifier = Modifier.width(50.dp))
                 Column {
@@ -86,7 +72,12 @@ fun TrainingPaceItem(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = trainingPace.distance.toString() + " %s".format(trainingPace.distanceType),
+                        text = when (trainingPace.distanceType) {
+                            MetricTypeEnum.KILOMETERS.type -> { trainingPace.distance / 1000 }
+                            MetricTypeEnum.MILES.type -> { trainingPace.distance / 1609.344 }
+                            else -> {trainingPace.distance}
+                        } .toString() + " %s".format(trainingPace.distanceType),
+
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                         overflow = TextOverflow.Ellipsis

@@ -3,9 +3,13 @@ package sk.upjs.vma.runningpacer.feature_vdot.presentation.addRun
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.scaleIn
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,7 +22,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import kotlinx.coroutines.flow.collectLatest
+import sk.upjs.vma.runningpacer.common.presentation.Screen
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TrainingPace
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
@@ -27,7 +33,7 @@ fun AddRunScreen(
     navController: NavController,
     viewModel: AddRunViewModel = hiltViewModel(),
 
-) {
+    ) {
 
     val scope = rememberCoroutineScope()
 
@@ -49,11 +55,8 @@ fun AddRunScreen(
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
-                is AddRunViewModel.UiEvent.ShowSnackbar -> {
-                    // TODO()
-                    //scaffoldState.snackbarHostState.showSnackbar(
-                    //   message = event.message
-                    // )
+                is AddRunViewModel.UiEvent.ShowSnack -> {
+                    TODO()
                 }
                 is AddRunViewModel.UiEvent.SaveNote -> {
                     navController.navigateUp()
@@ -63,7 +66,6 @@ fun AddRunScreen(
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxHeight(0.9f),
         topBar = {
             SmallTopAppBar(
                 title = { Text("Add your run") }
@@ -73,10 +75,10 @@ fun AddRunScreen(
             Column(
                 modifier = Modifier
                     .padding(innerPadding)
-                    .padding().fillMaxSize()
+                    .verticalScroll(rememberScrollState())
                     .padding(20.dp)
             ) {
-                Row {
+                Row(horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
                         text = "Difficulty:",
                         style = MaterialTheme.typography.displaySmall,
@@ -89,7 +91,7 @@ fun AddRunScreen(
                         onExpandedChange = { expandedDifficulty = !expandedDifficulty },
                     ) {
                         viewModel.onEvent(AddRunEvent.RunDifficulty(pickedDifficulty))
-                        TextField(
+                        OutlinedTextField(
                             readOnly = true,
                             value = pickedDifficulty,
                             onValueChange = {},
@@ -106,7 +108,11 @@ fun AddRunScreen(
                                     onClick = {
                                         pickedDifficulty = selectionOption
                                         expandedDifficulty = false
-                                        viewModel.onEvent(AddRunEvent.RunDifficulty(selectionOption))
+                                        viewModel.onEvent(
+                                            AddRunEvent.RunDifficulty(
+                                                selectionOption
+                                            )
+                                        )
                                     }
                                 )
                             }
@@ -114,7 +120,7 @@ fun AddRunScreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(25.dp))
-                Row {
+                Row(horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
                         text = "Distance:",
                         style = MaterialTheme.typography.displaySmall,
@@ -122,13 +128,20 @@ fun AddRunScreen(
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.width(15.dp))
-                    TextField(
-                        modifier = Modifier.weight(0.5f) ,
+                    OutlinedTextField(
+                        modifier = Modifier.weight(0.5f),
                         value = textDistance,
                         onValueChange = {
                             textDistance = it
-                            viewModel.onEvent(AddRunEvent.RunDistance(textDistance.replace(",", ".")))
-                            textPace = viewModel.runPace.value.text
+                            viewModel.onEvent(
+                                AddRunEvent.RunDistance(
+                                    textDistance.replace(
+                                        ",",
+                                        "."
+                                    )
+                                )
+                            )
+                            textPace = viewModel.runPace.value
                         },
                         placeholder = { Text("Fill") },
                         singleLine = true,
@@ -141,11 +154,17 @@ fun AddRunScreen(
                         onExpandedChange = { expandedDistance = !expandedDistance },
                     ) {
                         viewModel.onEvent(AddRunEvent.PickedDistance(pickedDistance))
-                        TextField(
+                        OutlinedTextField(
                             readOnly = true,
                             singleLine = true,
                             value = pickedDistance,
-                            onValueChange = {viewModel.onEvent(AddRunEvent.PickedDistance(pickedDistance))},
+                            onValueChange = {
+                                viewModel.onEvent(
+                                    AddRunEvent.PickedDistance(
+                                        pickedDistance
+                                    )
+                                )
+                            },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedDistance) },
                             colors = ExposedDropdownMenuDefaults.textFieldColors(),
                         )
@@ -159,8 +178,12 @@ fun AddRunScreen(
                                     onClick = {
                                         pickedDistance = selectionOption
                                         expandedDistance = false
-                                        viewModel.onEvent(AddRunEvent.PickedDistance(selectionOption))
-                                        textPace = viewModel.runPace.value.text
+                                        viewModel.onEvent(
+                                            AddRunEvent.PickedDistance(
+                                                selectionOption
+                                            )
+                                        )
+                                        textPace = viewModel.runPace.value
                                     }
                                 )
                             }
@@ -168,7 +191,7 @@ fun AddRunScreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(25.dp))
-                Row {
+                Row(horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
                         text = "Time:",
                         style = MaterialTheme.typography.displaySmall,
@@ -176,13 +199,13 @@ fun AddRunScreen(
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.width(15.dp))
-                    TextField(
+                    OutlinedTextField(
                         modifier = Modifier.weight(0.33f),
                         value = textHHTime,
                         onValueChange = {
                             textHHTime = it
                             viewModel.onEvent(AddRunEvent.RunTimeHH(textHHTime))
-                            textPace = viewModel.runPace.value.text
+                            textPace = viewModel.runPace.value
                             editable = true
                         },
                         placeholder = { Text("hh") },
@@ -190,13 +213,13 @@ fun AddRunScreen(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
                     )
                     Spacer(modifier = Modifier.width(5.dp))
-                    TextField(
+                    OutlinedTextField(
                         modifier = Modifier.weight(0.33f),
                         value = textMMTime,
                         onValueChange = {
                             textMMTime = it
                             viewModel.onEvent(AddRunEvent.RunTimeMM(textMMTime))
-                            textPace = viewModel.runPace.value.text
+                            textPace = viewModel.runPace.value
                             editable = true
                         },
                         placeholder = { Text("mm") },
@@ -204,13 +227,13 @@ fun AddRunScreen(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
                     )
                     Spacer(modifier = Modifier.width(5.dp))
-                    TextField(
+                    OutlinedTextField(
                         modifier = Modifier.weight(0.33f),
                         value = textSSTime,
                         onValueChange = {
                             textSSTime = it
                             viewModel.onEvent(AddRunEvent.RunTimeSS(textSSTime))
-                            textPace = viewModel.runPace.value.text
+                            textPace = viewModel.runPace.value
                             editable = true
                         },
                         placeholder = { Text("ss") },
@@ -220,36 +243,39 @@ fun AddRunScreen(
                 }
                 Spacer(modifier = Modifier.height(100.dp))
 
-                AnimatedVisibility(visible = editable,
-                enter = scaleIn()) {
-                    Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
+                AnimatedVisibility(
+                    visible = editable,
+                    enter = scaleIn()
                 ) {
-                    Text(
-                        text = "Calculated pace:",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Spacer(modifier = Modifier.height(15.dp))
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        ),
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.align(Alignment.CenterHorizontally),
-                            text = textPace,
+                            text = "Calculated pace:",
                             style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onSurface,
                             overflow = TextOverflow.Ellipsis
                         )
-                    }
+                        Spacer(modifier = Modifier.height(15.dp))
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            ),
+                        ) {
+                            Text(
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.align(Alignment.CenterHorizontally),
+                                text = textPace,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 }
+
             }
         },
         floatingActionButton = {

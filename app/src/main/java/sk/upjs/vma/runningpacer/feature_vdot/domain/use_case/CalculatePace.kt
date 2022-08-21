@@ -2,9 +2,9 @@ package sk.upjs.vma.runningpacer.feature_vdot.domain.use_case
 
 import android.text.format.DateUtils
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.InvalidTrainingPaceException
-import sk.upjs.vma.runningpacer.feature_vdot.domain.model.MetricType
+import sk.upjs.vma.runningpacer.common.enum.MetricTypeEnum
 
-class CalcutatePace() {
+class CalculatePace() {
 
     @Throws(InvalidTrainingPaceException::class)
     operator fun invoke(
@@ -17,17 +17,17 @@ class CalcutatePace() {
         }
 
         when (runMetrics) {
-            MetricType.METERS.type -> {
+            MetricTypeEnum.METERS.type -> {
                 return minPerMetric(
                     1000 / runDistance.toDouble() * totalTime,
-                    MetricType.KILOMETERS.alias
+                    MetricTypeEnum.KILOMETERS.alias
                 )
             }
-            MetricType.KILOMETERS.type -> {
-                return minPerMetric(totalTime / runDistance.toDouble(), MetricType.KILOMETERS.alias)
+            MetricTypeEnum.KILOMETERS.type -> {
+                return minPerMetric(totalTime / runDistance.toDouble(), MetricTypeEnum.KILOMETERS.alias)
             }
-            MetricType.MILES.type -> {
-                return minPerMetric(totalTime / runDistance.toDouble(), MetricType.MILES.alias)
+            MetricTypeEnum.MILES.type -> {
+                return minPerMetric(totalTime / runDistance.toDouble(), MetricTypeEnum.MILES.alias)
             }
 
         }

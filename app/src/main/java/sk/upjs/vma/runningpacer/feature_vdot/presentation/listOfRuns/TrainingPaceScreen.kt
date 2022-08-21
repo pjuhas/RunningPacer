@@ -9,13 +9,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import sk.upjs.vma.runningpacer.common.enum.OrderByEnum
+import sk.upjs.vma.runningpacer.common.enum.OrderTypeEnum
 import sk.upjs.vma.runningpacer.common.presentation.Screen
+import sk.upjs.vma.runningpacer.feature_vdot.presentation.listOfRuns.components.SortDialog
 import sk.upjs.vma.runningpacer.feature_vdot.presentation.listOfRuns.components.TrainingPaceItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -25,54 +32,71 @@ fun TrainingPaceScreen(
     viewModel: TrainingPacesViewModel = hiltViewModel()
 ) {
     val state = viewModel.state.value
-    val snackbarHostState = remember { SnackbarHostState() }
+    val snackHostState = remember { SnackbarHostState() }
 
     val scope = rememberCoroutineScope()
-
-
-    Scaffold(
-        modifier = Modifier.fillMaxHeight(0.9f),
-        topBar = {
-            SmallTopAppBar(
-                title = { Text("Times & Paces") },
-                actions = {
-                    IconButton(onClick = {
-                        /*TODO*/
-                    }) {
-                        Icon(imageVector = Icons.Default.Sort, contentDescription = "Sort")
-                    }
-                }
-            )
-
-        },
-        content = { innerPadding ->
-            LazyColumn(contentPadding = innerPadding) {
-                items(state.trainingPaces) { trainingPace ->
-                    TrainingPaceItem(
-                        trainingPace = trainingPace,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                            )
-                }
-            }
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        floatingActionButton = {
-            FloatingActionButton(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.inverseOnSurface,
-                onClick = {
-                    navController.navigate(Screen.AddRun.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
-            ) { Icon(imageVector = Icons.Default.Add, contentDescription = "Add") }
+    OrderByEnum.values().forEach { it ->
+        if (it == OrderByEnum.DATE) {
+            it.mutableState = rememberSaveable { mutableStateOf(true) }
+        } else {
+            it.mutableState = rememberSaveable { mutableStateOf(false) }
         }
-    )
+        OrderTypeEnum.values().forEach {
+            if (it == OrderTypeEnum.DESCENDING) {
+                it.mutableState = rememberSaveable { mutableStateOf(true) }
+            } else {
+                it.mutableState = rememberSaveable { mutableStateOf(false) }
+            }
+        }
 
+        val openDialog = remember { mutableStateOf(false) }
+        if (openDialog.value) {
+            SortDialog(openDialog, viewModel)
+        }
+
+        Scaffold(
+            topBar = {
+                SmallTopAppBar(
+                    title = { Text("Times & Paces") },
+                    actions = {
+                        IconButton(onClick = {
+                            openDialog.value = true
+                        }) {
+                            Icon(imageVector = Icons.Default.Sort, contentDescription = "Sort")
+                        }
+
+                    }
+                )
+
+            },
+            content = { innerPadding ->
+                LazyColumn(contentPadding = innerPadding) {
+                    items(state.trainingPaces) { trainingPace ->
+                        TrainingPaceItem(
+                            trainingPace = trainingPace,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp)
+                        )
+                    }
+                }
+            },
+            snackbarHost = { SnackbarHost(snackHostState) },
+            floatingActionButton = {
+                FloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                    onClick = {
+                        navController.navigate(Screen.AddRun.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                ) { Icon(imageVector = Icons.Default.Add, contentDescription = "Add") }
+            }
+        )
+    }
 }

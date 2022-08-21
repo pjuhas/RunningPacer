@@ -3,6 +3,8 @@ package sk.upjs.vma.runningpacer.feature_vdot.domain.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import sk.upjs.vma.runningpacer.common.enum.MetricTypeEnum
+import sk.upjs.vma.runningpacer.common.enum.RunDifficultyEnum
 
 @Entity
 data class TrainingPace(
@@ -15,23 +17,9 @@ data class TrainingPace(
     @PrimaryKey(autoGenerate = true) var id: Int? = null
 ){
     companion object {
-        val metricType = MetricType.values().map { it.type }
-        val difficulties = RunDifficulty.values().map { it.type }
+        val metricType = MetricTypeEnum.values().map { it.type }
+        val difficulties = RunDifficultyEnum.values().map { it.type }
     }
-}
-
-enum class MetricType(val type: String, val alias: String){
-    METERS("m", "m"),
-    KILOMETERS("km", "km"),
-    MILES("Mile", "mile")
-}
-
-enum class RunDifficulty(val type: String){
-    EASY("Easy"),
-    TEMPO("Tempo"),
-    THRESHOLD("Threshold"),
-    INTERVAL("Interval"),
-    LONG("Long")
 }
 
 class InvalidTrainingPaceException(message: String): Exception(message)

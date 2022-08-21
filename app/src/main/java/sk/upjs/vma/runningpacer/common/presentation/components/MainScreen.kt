@@ -1,9 +1,12 @@
 package sk.upjs.vma.runningpacer.common.presentation.components
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -17,10 +20,13 @@ import sk.upjs.vma.runningpacer.common.presentation.Screen
 fun MainScreen() {
     val navController = rememberAnimatedNavController()
     Scaffold(
-        bottomBar = { BottomBar(navController = navController) }
-    ) {
-        BottomNavGraph(navController = navController)
-    }
+        bottomBar = { BottomBar(navController = navController) },
+        content = { paddingValues ->
+            Box(modifier = Modifier.padding(paddingValues)) {
+                BottomNavGraph(navController = navController)
+            }
+        }
+    )
 }
 
 @Composable

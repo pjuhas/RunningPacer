@@ -36,7 +36,7 @@ object AppModule {
         return TrainingPaceUseCases(
             getTrainingPaces = GetTrainingPaces(repository),
             addTrainingPace = AddTrainingPace(repository),
-            calculatePace = CalcutatePace(),
+            calculatePace = CalculatePace(),
             regularTimeToSec = RegularTimeToSec()
         )
     }

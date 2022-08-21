@@ -1,11 +1,11 @@
 package sk.upjs.vma.runningpacer.feature_vdot.presentation.listOfRuns
 
+import sk.upjs.vma.runningpacer.common.enum.OrderByEnum
+import sk.upjs.vma.runningpacer.common.enum.OrderTypeEnum
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TrainingPace
-import sk.upjs.vma.runningpacer.feature_vdot.domain.util.OrderType
-import sk.upjs.vma.runningpacer.feature_vdot.domain.util.TrainingPaceOrder
 
-data class TrainingPacesState (
+data class TrainingPacesState(
     val trainingPaces: List<TrainingPace> = emptyList(),
-    val trainingPaceOrder: TrainingPaceOrder = TrainingPaceOrder.Date(OrderType.Descending),
-    val isOrderSectionVisible: Boolean = false
+    val orderType: OrderTypeEnum = OrderTypeEnum.DESCENDING,
+    val orderBy: OrderByEnum = OrderByEnum.DATE
 )

@@ -8,9 +8,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import sk.upjs.vma.runningpacer.common.enum.OrderByEnum
+import sk.upjs.vma.runningpacer.common.enum.OrderTypeEnum
 import sk.upjs.vma.runningpacer.feature_vdot.domain.use_case.TrainingPaceUseCases
-import sk.upjs.vma.runningpacer.feature_vdot.domain.util.OrderType
-import sk.upjs.vma.runningpacer.feature_vdot.domain.util.TrainingPaceOrder
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,29 +24,34 @@ class TrainingPacesViewModel @Inject constructor(
     private var getTrainingPaceJob: Job? = null
 
     init {
-        getTrainingPaces(TrainingPaceOrder.Date(OrderType.Descending))
+        getTrainingPaces(OrderTypeEnum.DESCENDING, OrderByEnum.DATE)
     }
 
     fun onEvent(event: TrainingPacesEvent) {
         when (event) {
             is TrainingPacesEvent.Order -> {
-                if (state.value.trainingPaceOrder::class == event.trainingPaceOrder::class
-                    && state.value.trainingPaceOrder.orderType == event.trainingPaceOrder.orderType){
+                if (state.value.orderType::class == event.orderType::class
+                    && state.value.orderBy::class == event.orderBy::class
+                    && state.value.orderType == event.orderType
+                    && state.value.orderBy == event.orderBy
+                ) {
                     return
                 }
-                getTrainingPaces(event.trainingPaceOrder)
+                getTrainingPaces(event.orderType, event.orderBy)
             }
 
         }
     }
 
-    private fun getTrainingPaces(trainingPaceOrder: TrainingPaceOrder) {
+    private fun getTrainingPaces(orderType: OrderTypeEnum, orderBy: OrderByEnum) {
         getTrainingPaceJob?.cancel()
-        getTrainingPaceJob = trainingPacesUseCase.getTrainingPaces(trainingPaceOrder).onEach {
-            trainingPaces -> _state.value = state.value.copy(
-                trainingPaces = trainingPaces,
-                trainingPaceOrder = trainingPaceOrder
-            )
-        }.launchIn(viewModelScope)
+        getTrainingPaceJob = trainingPacesUseCase.getTrainingPaces.invoke(orderType, orderBy)
+            .onEach { trainingPaces ->
+                _state.value = state.value.copy(
+                    trainingPaces = trainingPaces,
+                    orderType = orderType,
+                    orderBy = orderBy
+                )
+            }.launchIn(viewModelScope)
     }
 }
