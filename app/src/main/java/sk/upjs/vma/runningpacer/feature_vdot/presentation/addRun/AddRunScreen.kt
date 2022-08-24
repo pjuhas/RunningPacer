@@ -3,15 +3,17 @@ package sk.upjs.vma.runningpacer.feature_vdot.presentation.addRun
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.scaleIn
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialogDefaults.shape
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -74,7 +76,7 @@ fun AddRunScreen(
                 title = { Text("Add your run") }
             )
         },
-        snackbarHost = { SnackbarHost(snackHostState) },
+        snackbarHost = { SnackbarHost(snackHostState, modifier = Modifier.padding(9.dp)) },
         content = { innerPadding ->
             Column(
                 modifier = Modifier
@@ -82,23 +84,23 @@ fun AddRunScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(20.dp)
             ) {
-                Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(
-                        text = "Difficulty:",
-                        style = MaterialTheme.typography.displaySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Spacer(modifier = Modifier.width(15.dp))
+                Row {
                     ExposedDropdownMenuBox(
                         expanded = expandedDifficulty,
                         onExpandedChange = { expandedDifficulty = !expandedDifficulty },
                     ) {
-                        viewModel.onEvent(AddRunEvent.RunDifficulty(pickedDifficulty))
                         OutlinedTextField(
+                            modifier = Modifier.fillMaxWidth(),
                             readOnly = true,
                             value = pickedDifficulty,
                             onValueChange = {},
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.DirectionsRun,
+                                    contentDescription = ""
+                                )
+                            },
+                            label = { Text("Difficulty") },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedDifficulty) },
                             colors = ExposedDropdownMenuDefaults.textFieldColors(),
                         )
@@ -112,26 +114,14 @@ fun AddRunScreen(
                                     onClick = {
                                         pickedDifficulty = selectionOption
                                         expandedDifficulty = false
-                                        viewModel.onEvent(
-                                            AddRunEvent.RunDifficulty(
-                                                selectionOption
-                                            )
-                                        )
                                     }
                                 )
                             }
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(25.dp))
+                Spacer(modifier = Modifier.height(20.dp))
                 Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(
-                        text = "Distance:",
-                        style = MaterialTheme.typography.displaySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Spacer(modifier = Modifier.width(15.dp))
                     OutlinedTextField(
                         modifier = Modifier.weight(0.5f),
                         value = textDistance,
@@ -147,7 +137,13 @@ fun AddRunScreen(
                             )
                             textPace = viewModel.runPace.value
                         },
-                        placeholder = { Text("Fill") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.AddRoad,
+                                contentDescription = ""
+                            )
+                        },
+                        label = { Text("Distance") },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
@@ -169,6 +165,7 @@ fun AddRunScreen(
                                     )
                                 )
                             },
+                            label = { Text("Metrics") },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedDistance) },
                             colors = ExposedDropdownMenuDefaults.textFieldColors(),
                         )
@@ -194,17 +191,10 @@ fun AddRunScreen(
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(25.dp))
+                Spacer(modifier = Modifier.height(20.dp))
                 Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(
-                        text = "Time:",
-                        style = MaterialTheme.typography.displaySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Spacer(modifier = Modifier.width(15.dp))
                     OutlinedTextField(
-                        modifier = Modifier.weight(0.33f),
+                        modifier = Modifier.weight(0.4f),
                         value = textHHTime,
                         onValueChange = {
                             textHHTime = it
@@ -212,13 +202,19 @@ fun AddRunScreen(
                             textPace = viewModel.runPace.value
                             editable = true
                         },
-                        placeholder = { Text("hh") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Timer,
+                                contentDescription = ""
+                            )
+                        },
+                        label = { Text("Hours") },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
                     )
                     Spacer(modifier = Modifier.width(5.dp))
                     OutlinedTextField(
-                        modifier = Modifier.weight(0.33f),
+                        modifier = Modifier.weight(0.3f),
                         value = textMMTime,
                         onValueChange = {
                             textMMTime = it
@@ -226,13 +222,13 @@ fun AddRunScreen(
                             textPace = viewModel.runPace.value
                             editable = true
                         },
-                        placeholder = { Text("mm") },
+                        label = { Text("Minutes") },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
                     )
                     Spacer(modifier = Modifier.width(5.dp))
                     OutlinedTextField(
-                        modifier = Modifier.weight(0.33f),
+                        modifier = Modifier.weight(0.3f),
                         value = textSSTime,
                         onValueChange = {
                             textSSTime = it
@@ -240,7 +236,7 @@ fun AddRunScreen(
                             textPace = viewModel.runPace.value
                             editable = true
                         },
-                        placeholder = { Text("ss") },
+                        label = { Text("Seconds") },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
                     )
@@ -287,6 +283,7 @@ fun AddRunScreen(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.inverseOnSurface,
                 onClick = {
+                    viewModel.onEvent(AddRunEvent.RunDifficulty(pickedDifficulty))
                     viewModel.onEvent(AddRunEvent.SaveNote)
                 }
             ) { Icon(imageVector = Icons.Default.Save, contentDescription = "Save") }

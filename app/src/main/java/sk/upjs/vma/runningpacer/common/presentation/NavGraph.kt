@@ -14,6 +14,7 @@ import com.google.accompanist.navigation.animation.composable
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.InvalidTrainingPaceException
 import sk.upjs.vma.runningpacer.feature_vdot.presentation.addRun.AddRunScreen
 import sk.upjs.vma.runningpacer.feature_vdot.presentation.listOfRuns.TrainingPaceScreen
+import sk.upjs.vma.runningpacer.feature_vdot.presentation.vdot.VdotScreen
 import java.lang.IllegalStateException
 
 @ExperimentalAnimationApi
@@ -25,11 +26,11 @@ fun BottomNavGraph(navController: NavHostController) {
 
     AnimatedNavHost(
         navController = navController,
-        startDestination = Screen.Calculate.route
+        startDestination = Screen.Profile.route
     ) {
-        composable(route = Screen.Calculate.route, enterTransition = {
+        composable(route = Screen.Profile.route, enterTransition = {
             when (initialState.destination.route) {
-                Screen.Profile.route -> slideInHorizontally(
+                Screen.Calculate.route -> slideInHorizontally(
                     initialOffsetX = { -1000 },
                     animationSpec = tweenSpec
                 )
@@ -40,7 +41,7 @@ fun BottomNavGraph(navController: NavHostController) {
         },
             exitTransition = {
                 when (targetState.destination.route) {
-                    Screen.Profile.route -> slideOutHorizontally(
+                    Screen.Calculate.route -> slideOutHorizontally(
                         targetOffsetX = { -1000 },
                         animationSpec = tweenSpec
                     )
@@ -51,10 +52,10 @@ fun BottomNavGraph(navController: NavHostController) {
             }) {
             TrainingPaceScreen(navController)
         }
-        composable(route = Screen.Profile.route,
+        composable(route = Screen.Calculate.route,
             enterTransition = {
                 when (initialState.destination.route) {
-                    Screen.Calculate.route -> slideInHorizontally(
+                    Screen.Profile.route -> slideInHorizontally(
                         initialOffsetX = { 1000 },
                         animationSpec = tweenSpec
                     )
@@ -65,7 +66,7 @@ fun BottomNavGraph(navController: NavHostController) {
             },
             exitTransition = {
                 when (targetState.destination.route) {
-                    Screen.Calculate.route -> slideOutHorizontally(
+                    Screen.Profile.route -> slideOutHorizontally(
                         targetOffsetX = { 1000 },
                         animationSpec = tweenSpec
                     )
@@ -75,7 +76,7 @@ fun BottomNavGraph(navController: NavHostController) {
                 }
             })
         {
-            TrainingPaceScreen(navController)
+            VdotScreen(navController = navController)
         }
         composable(route = Screen.AddRun.route) {
             AddRunScreen(navController)

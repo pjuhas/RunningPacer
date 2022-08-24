@@ -35,67 +35,68 @@ fun TrainingPaceScreen(
     val state = viewModel.state.value
     remember { SnackbarHostState() }
 
-    OrderByEnum.values().forEach { it ->
+    OrderByEnum.values().forEach {
         if (it == OrderByEnum.DATE) {
             it.mutableState = rememberSaveable { mutableStateOf(true) }
         } else {
             it.mutableState = rememberSaveable { mutableStateOf(false) }
         }
-        OrderTypeEnum.values().forEach {
-            if (it == OrderTypeEnum.DESCENDING) {
-                it.mutableState = rememberSaveable { mutableStateOf(true) }
-            } else {
-                it.mutableState = rememberSaveable { mutableStateOf(false) }
-            }
+    }
+    OrderTypeEnum.values().forEach {
+        if (it == OrderTypeEnum.DESCENDING) {
+            it.mutableState = rememberSaveable { mutableStateOf(true) }
+        } else {
+            it.mutableState = rememberSaveable { mutableStateOf(false) }
         }
+    }
 
-        val openDialog = remember { mutableStateOf(false) }
-        if (openDialog.value) {
-            SortDialog(openDialog, viewModel)
-        }
+    val openDialog = remember { mutableStateOf(false) }
+    if (openDialog.value) {
+        SortDialog(openDialog, viewModel)
+    }
 
-        Scaffold(
-            topBar = {
-                SmallTopAppBar(
-                    title = { Text("Times & Paces") },
-                    actions = {
-                        IconButton(onClick = {
-                            openDialog.value = true
-                        }) {
-                            Icon(imageVector = Icons.Default.Sort, contentDescription = "Sort")
-                        }
-
+    Scaffold(
+        topBar = {
+            SmallTopAppBar(
+                title = { Text("Times & Paces") },
+                actions = {
+                    IconButton(onClick = {
+                        openDialog.value = true
+                    }) {
+                        Icon(imageVector = Icons.Default.Sort, contentDescription = "Sort")
                     }
-                )
 
-            },
-            content = { innerPadding ->
-                LazyColumn(contentPadding = innerPadding) {
-                    items(state.trainingPaces) { trainingPace ->
-                        TrainingPaceItem(
-                            trainingPace = trainingPace,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp)
-                        )
+                }
+            )
+
+        },
+        content = { innerPadding ->
+            LazyColumn(contentPadding = innerPadding) {
+                items(state.trainingPaces) { trainingPace ->
+                    TrainingPaceItem(
+                        trainingPace = trainingPace,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                    )
+                }
+            }
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                onClick = {
+                    navController.navigate(Screen.AddRun.route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
                     }
                 }
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.inverseOnSurface,
-                    onClick = {
-                        navController.navigate(Screen.AddRun.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                ) { Icon(imageVector = Icons.Default.Add, contentDescription = "Add") }
-            }
-        )
-    }
+            ) { Icon(imageVector = Icons.Default.Add, contentDescription = "Add") }
+        }
+    )
+
 }
