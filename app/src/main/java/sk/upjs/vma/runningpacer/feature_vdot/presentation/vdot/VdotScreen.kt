@@ -17,23 +17,30 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
+import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TableData
 import sk.upjs.vma.runningpacer.common.enum.CalculatorOptions
 import sk.upjs.vma.runningpacer.common.enum.DistanceOptions
+
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun VdotScreen(
     navController: NavController,
-    viewModel: VdotViewModel = hiltViewModel()
+    viewModel: VdotViewModel = hiltViewModel(),
+    dataStorePace: TableData
 ) {
-
     val showResults = rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    viewModel.onEvent(VdotEvent.LoadData(context = context))
+
     CalculatorOptions.values().forEach {
         if (it == CalculatorOptions.TRAINING) {
             it.mutableState = rememberSaveable { mutableStateOf(true) }
@@ -88,16 +95,16 @@ fun VdotScreen(
                             visible = option.mutableState!!.value,
                             enter = expandVertically()
                         ) {
-                            VdotContent(viewModel, option, showResults)
+                            VdotContent(viewModel, option, showResults, dataStorePace)
                         }
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                 }
                 AnimatedVisibility(
-                    visible = showResults.value,
+                    visible = true,
                     enter = expandVertically()
                 ) {
-                    VdotShowResultsContent(viewModel)
+                    VdotShowResultsContent(viewModel, dataStorePace)
                 }
             }
         })
@@ -108,8 +115,10 @@ fun VdotScreen(
 fun VdotContent(
     viewModel: VdotViewModel,
     option: CalculatorOptions,
-    showResults: MutableState<Boolean>
+    showResults: MutableState<Boolean>,
+    dataStorePace: TableData
 ) {
+    val scope = rememberCoroutineScope()
     var expandedOption by remember { mutableStateOf(false) }
     var pickedOption by rememberSaveable { mutableStateOf(DistanceOptions.values()[0].type) }
     var textHHTime by rememberSaveable { mutableStateOf("") }
@@ -199,6 +208,17 @@ fun VdotContent(
         OutlinedButton(onClick = {
             option.mutableState!!.value = !option.mutableState!!.value
             showResults.value = true
+            scope.launch {
+                viewModel.onEvent(
+                    VdotEvent.Calculate(
+                        DistanceOptions.values().first { it.type == pickedOption },
+                        textSSTime,
+                        textMMTime,
+                        textHHTime,
+                    )
+                )
+            }
+
         }) { Text("Calculate") }
         Spacer(modifier = Modifier.height(20.dp))
     }
@@ -207,13 +227,160 @@ fun VdotContent(
 
 @Composable
 fun VdotShowResultsContent(
-    viewModel: VdotViewModel
+    viewModel: VdotViewModel,
+    dataStorePace: TableData
 ) {
-    Divider(
-        modifier = Modifier.fillMaxWidth(),
-        thickness = 3.dp,
-        color = MaterialTheme.colorScheme.primary
-    )
+
+    Column() {
+        Divider(
+            modifier = Modifier.fillMaxWidth(),
+            thickness = 3.dp,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(modifier = Modifier.height(25.dp))
+
+        OutlinedCard(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                Column(modifier = Modifier.padding(10.dp)) {
+                    Text(text = "Distance", color = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    DistanceOptions.values().forEach {
+                        Text(
+                            text = it.type,
+                            style = MaterialTheme.typography.titleMedium,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
+                }
+                Column(modifier = Modifier.padding(10.dp)) {
+                    Text(text = "Time", color = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.raceTimes.distanceMarathon.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.raceTimes.distanceHalfMarathon.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.raceTimes.distanceFiveteenk.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.raceTimes.distanceTenk.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.raceTimes.distanceFivek.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.raceTimes.distanceTwoMiles.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.raceTimes.distanceThreek.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.raceTimes.distanceOnemile.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.raceTimes.distanceOnefivem.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                }
+                Column(modifier = Modifier.padding(10.dp)) {
+                    Text(text = "Pace", color = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.racePace.distanceMarathon.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.racePace.distanceHalfMarathon.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.racePace.distanceFiveteenk.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.racePace.distanceTenk.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.racePace.distanceFivek.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.racePace.distanceTwoMiles.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.racePace.distanceThreek.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.racePace.distanceOnemile.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = dataStorePace.racePace.distanceOnefivem.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+
+    }
 }
 
 

@@ -11,20 +11,20 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TableData
 import sk.upjs.vma.runningpacer.common.presentation.BottomNavGraph
 import sk.upjs.vma.runningpacer.common.presentation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(dataStorePace: TableData) {
     val navController = rememberAnimatedNavController()
     Scaffold(
         bottomBar = { BottomBar(navController = navController) },
         content = { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
-                BottomNavGraph(navController = navController)
+                BottomNavGraph(navController = navController, dataStorePace)
             }
         }
     )
@@ -54,7 +54,6 @@ fun BottomBar(navController: NavHostController) {
                         restoreState = true
                     }
                 }
-
             )
         }
     }

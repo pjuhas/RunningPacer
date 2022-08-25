@@ -45,7 +45,7 @@ class TrainingPacesViewModel @Inject constructor(
 
     private fun getTrainingPaces(orderType: OrderTypeEnum, orderBy: OrderByEnum) {
         getTrainingPaceJob?.cancel()
-        getTrainingPaceJob = trainingPacesUseCase.getTrainingPaces.invoke(orderType, orderBy)
+        getTrainingPaceJob = trainingPacesUseCase.getTrainingPaces(orderType, orderBy)
             .onEach { trainingPaces ->
                 _state.value = state.value.copy(
                     trainingPaces = trainingPaces,
