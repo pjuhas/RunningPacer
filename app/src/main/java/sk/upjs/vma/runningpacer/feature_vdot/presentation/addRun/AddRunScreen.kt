@@ -208,7 +208,7 @@ fun AddRunScreen(
                                 contentDescription = ""
                             )
                         },
-                        label = { Text("Hours") },
+                        label = { Text("Hrs") },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
                     )
@@ -222,7 +222,7 @@ fun AddRunScreen(
                             textPace = viewModel.runPace.value
                             editable = true
                         },
-                        label = { Text("Minutes") },
+                        label = { Text("Min") },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
                     )
@@ -236,7 +236,7 @@ fun AddRunScreen(
                             textPace = viewModel.runPace.value
                             editable = true
                         },
-                        label = { Text("Seconds") },
+                        label = { Text("Sec") },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
                     )
