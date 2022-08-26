@@ -1,12 +1,12 @@
 package sk.upjs.vma.runningpacer.feature_vdot.domain.use_case
 
+import sk.upjs.vma.runningpacer.common.enum.DistanceOptions
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.RacePace
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.RaceTimes
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TableData
-import sk.upjs.vma.runningpacer.common.enum.DistanceOptions
-import sk.upjs.vma.runningpacer.feature_vdot.domain.repository.DefaultDataStoreRepository
+import sk.upjs.vma.runningpacer.feature_vdot.domain.repository.DataRepository
 
-class GetRacePaces(private val repository: DefaultDataStoreRepository) {
+class GetRacePaces(private val repository: DataRepository) {
 
     suspend operator fun invoke(
         distanceOptions: DistanceOptions,
@@ -16,17 +16,17 @@ class GetRacePaces(private val repository: DefaultDataStoreRepository) {
             DistanceOptions.MARATHON.type -> {
                 val distanceObject = TableData(
                     racePace = RacePace(
-                        distanceMarathon = 8,
-                        distanceHalfMarathon = 7,
-                        distanceFiveteenk = 6,
-                        distanceTenk = 5,
-                        distanceFivek = 4,
-                        distanceTwoMiles = 3,
-                        distanceThreek = 2,
-                        distanceOnemile = 1,
-                        distanceOnefivem = 0
+                        distanceMarathon = 20,
+                        distanceHalfMarathon = 19,
+                        distanceFiveteenk = 18,
+                        distanceTenk = 17,
+                        distanceFivek = 16,
+                        distanceTwoMiles =15,
+                        distanceThreek = 15,
+                        distanceOnemile = 14,
+                        distanceOnefivem = 21
                     ),
-                    raceTimes = RaceTimes(),
+                    raceTimes = RaceTimes(8,2,6,564,4,5,9,77,52),
                     vdot = 5
                 )
                 repository.setRaceDistances(

@@ -87,13 +87,7 @@ fun TrainingPaceScreen(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.inverseOnSurface,
                 onClick = {
-                    navController.navigate(Screen.AddRun.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
+                    navController.navigate(Screen.AddRun.route)
                 }
             ) { Icon(imageVector = Icons.Default.Add, contentDescription = "Add") }
         }

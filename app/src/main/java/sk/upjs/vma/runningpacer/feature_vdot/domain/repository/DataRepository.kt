@@ -1,4 +1,4 @@
-package sk.upjs.vma.runningpacer.feature_vdot.data.repository
+package sk.upjs.vma.runningpacer.feature_vdot.domain.repository
 
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TableData
 

@@ -14,8 +14,8 @@ import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TableData
 import sk.upjs.vma.runningpacer.common.presentation.dataStore
 import sk.upjs.vma.runningpacer.feature_vdot.data.data_source.TrainingPaceDatabase
 import sk.upjs.vma.runningpacer.feature_vdot.data.repository.TrainingPaceImpl
-import sk.upjs.vma.runningpacer.feature_vdot.data.repository.DataRepository
-import sk.upjs.vma.runningpacer.feature_vdot.domain.repository.DefaultDataStoreRepository
+import sk.upjs.vma.runningpacer.feature_vdot.domain.repository.DataRepository
+import sk.upjs.vma.runningpacer.feature_vdot.data.repository.DefaultDataStoreRepository
 import sk.upjs.vma.runningpacer.feature_vdot.domain.repository.TrainingPaceRepository
 import sk.upjs.vma.runningpacer.feature_vdot.domain.use_case.*
 import javax.inject.Singleton
@@ -55,15 +55,17 @@ object AppModule {
         )
     }
 
+
     @Provides
     @Reusable
     fun provideProtoDataStore(@ApplicationContext context: Context) =
         context.dataStore
 
+
     @Provides
     @Singleton
     fun providesDataStoreRepository(
-        @ApplicationContext context: Context,
+        //@ApplicationContext context: Context,
         dataStore: DataStore<TableData>
     ): DataRepository {
         return DefaultDataStoreRepository(

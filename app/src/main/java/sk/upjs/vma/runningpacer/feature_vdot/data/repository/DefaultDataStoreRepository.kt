@@ -1,11 +1,11 @@
-package sk.upjs.vma.runningpacer.feature_vdot.domain.repository
+package sk.upjs.vma.runningpacer.feature_vdot.data.repository
 
 import android.util.Log
 import androidx.datastore.core.DataStore
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.RacePace
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.RaceTimes
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TableData
-import sk.upjs.vma.runningpacer.feature_vdot.data.repository.DataRepository
+import sk.upjs.vma.runningpacer.feature_vdot.domain.repository.DataRepository
 import javax.inject.Inject
 
 
@@ -28,17 +28,17 @@ class DefaultDataStoreRepository @Inject constructor(
                     distance.racePace.distanceOnefivem
                 ),
                 raceTimes = RaceTimes(
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0
+                    distance.raceTimes.distanceMarathon,
+                    distance.raceTimes.distanceHalfMarathon,
+                    distance.raceTimes.distanceFiveteenk,
+                    distance.raceTimes.distanceTenk,
+                    distance.raceTimes.distanceFivek,
+                    distance.raceTimes.distanceTwoMiles,
+                    distance.raceTimes.distanceThreek,
+                    distance.raceTimes.distanceOnemile,
+                    distance.raceTimes.distanceOnefivem
                 ),
-                vdot = 0
+                vdot = distance.vdot
             )
         }
         Log.v("setRaceDistances", "Saved")
