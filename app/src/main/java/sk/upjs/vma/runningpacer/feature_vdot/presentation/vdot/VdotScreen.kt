@@ -2,7 +2,6 @@ package sk.upjs.vma.runningpacer.feature_vdot.presentation.vdot
 
 import android.text.format.DateUtils
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -23,7 +22,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.RaceTableData
 import sk.upjs.vma.runningpacer.common.enum.CalculatorOptions
@@ -40,8 +38,11 @@ fun VdotScreen(
     dataStoreRace: RaceTableData,
     dataStoreTraining: TrainingTableData
 ) {
-    val showResults = rememberSaveable { mutableStateOf(false) }
     val parseJson = rememberSaveable { mutableStateOf(true) }
+    val showTrainingAndPaceResults = rememberSaveable { mutableStateOf(true) }
+    CalculatorOptions.ENTRY.mutableState = rememberSaveable {
+        mutableStateOf(false)
+    }
     val context = LocalContext.current
 
     if (parseJson.value) {
@@ -49,8 +50,12 @@ fun VdotScreen(
         parseJson.value = false
     }
 
-    CalculatorOptions.ENTRY.mutableState = rememberSaveable {
-        mutableStateOf(false)
+    /**
+     * CLEAN APP - FIRST TIME RUN CHECK
+     */
+    if (dataStoreRace.raceTimes.vdot == 0) {
+        showTrainingAndPaceResults.value = false
+        CalculatorOptions.ENTRY.mutableState!!.value = true
     }
 
     Scaffold(
@@ -99,13 +104,13 @@ fun VdotScreen(
                         visible = CalculatorOptions.ENTRY.mutableState!!.value,
                         enter = expandVertically()
                     ) {
-                        VdotContent(viewModel, CalculatorOptions.ENTRY, showResults)
+                        VdotContent(viewModel, CalculatorOptions.ENTRY, showTrainingAndPaceResults)
                     }
                 }
                 Spacer(modifier = Modifier.height(15.dp))
 
                 AnimatedVisibility(
-                    visible = true,
+                    visible = showTrainingAndPaceResults.value,
                     enter = expandVertically()
                 ) {
                     VdotShowRaceResultsContent(dataStoreRace, dataStoreTraining)
@@ -125,7 +130,7 @@ fun VdotScreen(
 fun VdotContent(
     viewModel: VdotViewModel,
     option: CalculatorOptions,
-    showResults: MutableState<Boolean>
+    showTrainingAndPaceContent: MutableState<Boolean>
 ) {
     val scope = rememberCoroutineScope()
     var expandedOption by remember { mutableStateOf(false) }
@@ -216,8 +221,8 @@ fun VdotContent(
         Spacer(modifier = Modifier.height(20.dp))
         OutlinedButton(onClick = {
             option.mutableState!!.value = !option.mutableState!!.value
-            showResults.value = true
             if (textHHTime.isNotEmpty() || textMMTime.isNotEmpty() || textSSTime.isNotEmpty()) {
+                showTrainingAndPaceContent.value = true
                 scope.launch {
                     viewModel.onEvent(
                         VdotEvent.Calculate(

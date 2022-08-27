@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class TrainingTableData(
-    val vdotType: VdotType = VdotType(30),
+    val vdotType: VdotType = VdotType(0),
     val easyType: EasyType = EasyType(""),
     val marathonType: MarathonType = MarathonType(0),
     val thresholdType: ThresholdType = ThresholdType(0, 0),
@@ -14,7 +14,7 @@ data class TrainingTableData(
 
 @Serializable
 class VdotType(
-    val vdot: Int = 30
+    val vdot: Int = 0
 )
 
 @Serializable

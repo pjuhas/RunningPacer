@@ -5,16 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RaceTableData(
     var racePace: RacePace = RacePace("", "", "", "", "", "", "", "", ""),
-    val raceTimes: RaceTimes = RaceTimes(
-        Int.MAX_VALUE,
-        Int.MAX_VALUE,
-        Int.MAX_VALUE,
-        Int.MAX_VALUE,
-        Int.MAX_VALUE,
-        Int.MAX_VALUE,
-        Int.MAX_VALUE,
-        Int.MAX_VALUE
-    ),
+    val raceTimes: RaceTimes = RaceTimes(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 )
 
 
