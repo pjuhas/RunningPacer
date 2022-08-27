@@ -9,14 +9,15 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavHostController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
-import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TableData
+import sk.upjs.vma.runningpacer.feature_vdot.domain.model.RaceTableData
+import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TrainingTableData
 import sk.upjs.vma.runningpacer.feature_vdot.presentation.addRun.AddRunScreen
 import sk.upjs.vma.runningpacer.feature_vdot.presentation.listOfRuns.TrainingPaceScreen
 import sk.upjs.vma.runningpacer.feature_vdot.presentation.vdot.VdotScreen
 
 @ExperimentalAnimationApi
 @Composable
-fun BottomNavGraph(navController: NavHostController, dataStorePace: TableData) {
+fun BottomNavGraph(navController: NavHostController, dataStoreRace: RaceTableData, dataStoreTraining: TrainingTableData) {
     val tweenSpec = tween<IntOffset>(
         durationMillis = 300
     )
@@ -73,7 +74,7 @@ fun BottomNavGraph(navController: NavHostController, dataStorePace: TableData) {
                 }
             })
         {
-            VdotScreen(navController = navController, dataStorePace = dataStorePace)
+            VdotScreen(dataStoreRace = dataStoreRace, dataStoreTraining = dataStoreTraining)
         }
         composable(route = Screen.AddRun.route) {
             AddRunScreen(navController)

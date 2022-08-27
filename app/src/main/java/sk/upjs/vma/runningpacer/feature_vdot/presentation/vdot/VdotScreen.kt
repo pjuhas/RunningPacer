@@ -1,5 +1,6 @@
 package sk.upjs.vma.runningpacer.feature_vdot.presentation.vdot
 
+import android.text.format.DateUtils
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
@@ -24,29 +25,32 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
-import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TableData
+import sk.upjs.vma.runningpacer.feature_vdot.domain.model.RaceTableData
 import sk.upjs.vma.runningpacer.common.enum.CalculatorOptions
 import sk.upjs.vma.runningpacer.common.enum.DistanceOptions
+import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TrainingTableData
 
+val MINPERKM = " min/km"
+val SEC = " sec"
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VdotScreen(
-    navController: NavController,
     viewModel: VdotViewModel = hiltViewModel(),
-    dataStorePace: TableData
+    dataStoreRace: RaceTableData,
+    dataStoreTraining: TrainingTableData
 ) {
     val showResults = rememberSaveable { mutableStateOf(false) }
+    val parseJson = rememberSaveable { mutableStateOf(true) }
     val context = LocalContext.current
 
-    viewModel.onEvent(VdotEvent.LoadData(context = context))
+    if (parseJson.value) {
+        viewModel.onEvent(VdotEvent.LoadData(context = context))
+        parseJson.value = false
+    }
 
-    CalculatorOptions.values().forEach {
-        if (it == CalculatorOptions.TRAINING) {
-            it.mutableState = rememberSaveable { mutableStateOf(true) }
-        } else {
-            it.mutableState = rememberSaveable { mutableStateOf(false) }
-        }
+    CalculatorOptions.ENTRY.mutableState = rememberSaveable {
+        mutableStateOf(false)
     }
 
     Scaffold(
@@ -63,60 +67,65 @@ fun VdotScreen(
                     .padding(20.dp)
                     .fillMaxWidth()
             ) {
-                CalculatorOptions.values().forEach { option ->
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = option.type, style = MaterialTheme.typography.displaySmall,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        OutlinedIconToggleButton(
-                            checked = option.mutableState!!.value,
-                            onCheckedChange = { option.mutableState!!.value = it }) {
-                            if (option.mutableState!!.value) {
-                                Icon(
-                                    Icons.Outlined.ArrowDropUp,
-                                    contentDescription = "Up"
-                                )
-                            } else {
-                                Icon(
-                                    Icons.Filled.ArrowDropDown,
-                                    contentDescription = "Down"
-                                )
-                            }
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = CalculatorOptions.ENTRY.type,
+                        style = MaterialTheme.typography.displaySmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    OutlinedIconToggleButton(
+                        checked = CalculatorOptions.ENTRY.mutableState!!.value,
+                        onCheckedChange = { CalculatorOptions.ENTRY.mutableState!!.value = it }) {
+                        if (CalculatorOptions.ENTRY.mutableState!!.value) {
+                            Icon(
+                                Icons.Outlined.ArrowDropUp,
+                                contentDescription = "Up"
+                            )
+                        } else {
+                            Icon(
+                                Icons.Filled.ArrowDropDown,
+                                contentDescription = "Down"
+                            )
                         }
                     }
-                    Spacer(modifier = Modifier.height(30.dp))
-                    Column {
-                        AnimatedVisibility(
-                            visible = option.mutableState!!.value,
-                            enter = expandVertically()
-                        ) {
-                            VdotContent(viewModel, option, showResults, dataStorePace)
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(20.dp))
                 }
+                Spacer(modifier = Modifier.height(15.dp))
+                Column {
+                    AnimatedVisibility(
+                        visible = CalculatorOptions.ENTRY.mutableState!!.value,
+                        enter = expandVertically()
+                    ) {
+                        VdotContent(viewModel, CalculatorOptions.ENTRY, showResults)
+                    }
+                }
+                Spacer(modifier = Modifier.height(15.dp))
+
                 AnimatedVisibility(
                     visible = true,
                     enter = expandVertically()
                 ) {
-                    VdotShowResultsContent(viewModel, dataStorePace)
+                    VdotShowRaceResultsContent(dataStoreRace, dataStoreTraining)
                 }
             }
         })
 }
+
+
+/**
+ * Function to create dropdown animation, textFields and provide calculations for later usage
+ * (calculating Race Paces and Training Paces
+ */
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VdotContent(
     viewModel: VdotViewModel,
     option: CalculatorOptions,
-    showResults: MutableState<Boolean>,
-    dataStorePace: TableData
+    showResults: MutableState<Boolean>
 ) {
     val scope = rememberCoroutineScope()
     var expandedOption by remember { mutableStateOf(false) }
@@ -177,7 +186,7 @@ fun VdotContent(
                         contentDescription = ""
                     )
                 },
-                label = { Text("Hours") },
+                label = { Text("Hrs") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
             )
@@ -188,7 +197,7 @@ fun VdotContent(
                 onValueChange = {
                     textMMTime = it
                 },
-                label = { Text("Minutes") },
+                label = { Text("Min") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
             )
@@ -199,7 +208,7 @@ fun VdotContent(
                 onValueChange = {
                     textSSTime = it
                 },
-                label = { Text("Seconds") },
+                label = { Text("Sec") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
             )
@@ -208,38 +217,275 @@ fun VdotContent(
         OutlinedButton(onClick = {
             option.mutableState!!.value = !option.mutableState!!.value
             showResults.value = true
-            scope.launch {
-                viewModel.onEvent(
-                    VdotEvent.Calculate(
-                        DistanceOptions.values().first { it.type == pickedOption },
-                        textSSTime,
-                        textMMTime,
-                        textHHTime,
+            if (textHHTime.isNotEmpty() || textMMTime.isNotEmpty() || textSSTime.isNotEmpty()) {
+                scope.launch {
+                    viewModel.onEvent(
+                        VdotEvent.Calculate(
+                            DistanceOptions.values().first { it.type == pickedOption },
+                            textSSTime,
+                            textMMTime,
+                            textHHTime,
+                        )
                     )
-                )
+                }
             }
-
         }) { Text("Calculate") }
         Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
-
+/**
+ * Composable to generate 2 cards - training pace and race pace
+ */
 @Composable
-fun VdotShowResultsContent(
-    viewModel: VdotViewModel,
-    dataStorePace: TableData
+fun VdotShowRaceResultsContent(
+    dataStorePace: RaceTableData,
+    dataStoreTraining: TrainingTableData
 ) {
-
     Column() {
+        /** Start of Training examples Card
+         */
+
+        Spacer(modifier = Modifier.height(20.dp))
         Divider(
             modifier = Modifier.fillMaxWidth(),
             thickness = 3.dp,
             color = MaterialTheme.colorScheme.primary
         )
+        Spacer(modifier = Modifier.height(20.dp))
+        Text(
+            text = "Training times",
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.height(15.dp))
+        Text(
+            text = "General",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.height(15.dp))
+
+        OutlinedCard(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column() {
+                    Text(text = "VDOT", color = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(text = "Easy", color = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(text = "Marathon", color = MaterialTheme.colorScheme.primary)
+                }
+                Column() {
+                    Text(
+                        text = dataStoreTraining.vdotType.vdot.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = dataStoreTraining.easyType.distanceKm + MINPERKM,
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = dataStoreTraining.marathonType.distanceKm.getRunningTime() + MINPERKM,
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(15.dp))
+        Text(
+            text = "Threshold",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.height(15.dp))
+        OutlinedCard(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column() {
+                    Text(text = "Km", color = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(text = "400 m", color = MaterialTheme.colorScheme.primary)
+                }
+                Column() {
+                    Text(
+                        text = dataStoreTraining.thresholdType.distanceKm.getRunningTime() + MINPERKM,
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = dataStoreTraining.thresholdType.distanceFourm.getRunningTime() + MINPERKM,
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(15.dp))
+        Text(
+            text = "Interval",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.height(15.dp))
+        OutlinedCard(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column() {
+                    Text(text = "400 m", color = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(text = "Km", color = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(text = "1200 m", color = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(text = "Mile", color = MaterialTheme.colorScheme.primary)
+                }
+                Column() {
+                    Text(
+                        text = if (dataStoreTraining.intervalType.distanceFourm == 0) "-" else dataStoreTraining.intervalType.distanceFourm.getRunningTime() + MINPERKM,
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = if (dataStoreTraining.intervalType.distanceKm == 0) "-" else dataStoreTraining.intervalType.distanceKm.getRunningTime() + MINPERKM,
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = if (dataStoreTraining.intervalType.distanceOnetwom == 0) "-" else dataStoreTraining.intervalType.distanceOnetwom.getRunningTime() + MINPERKM,
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = if (dataStoreTraining.intervalType.distanceMile == 0) "-" else dataStoreTraining.intervalType.distanceMile.getRunningTime() + MINPERKM,
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+        Spacer(modifier = Modifier.height(15.dp))
+        Text(
+            text = "Relay",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.primary,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.height(15.dp))
+        OutlinedCard(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column() {
+                    Text(text = "200 m", color = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(text = "300 m", color = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(text = "400 m", color = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(text = "600 m", color = MaterialTheme.colorScheme.primary)
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(text = "800 m", color = MaterialTheme.colorScheme.primary)
+                }
+                Column() {
+                    Text(
+                        text = if (dataStoreTraining.relayType.distanceTwom == 0) "-" else dataStoreTraining.relayType.distanceTwom.toString() + SEC,
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = if (dataStoreTraining.relayType.distanceThreem == 0) "-" else dataStoreTraining.relayType.distanceThreem.toString() + SEC,
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = if (dataStoreTraining.relayType.distanceFourm == 0) "-" else dataStoreTraining.relayType.distanceFourm.toString() + SEC,
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = if (dataStoreTraining.relayType.distanceSixm == 0) "-" else dataStoreTraining.relayType.distanceSixm.toString() + SEC,
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Spacer(modifier = Modifier.height(5.dp))
+                    Text(
+                        text = if (dataStoreTraining.relayType.distanceEightm == 0) "-" else dataStoreTraining.relayType.distanceEightm.toString() + SEC,
+                        style = MaterialTheme.typography.titleMedium,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
+
 
         Spacer(modifier = Modifier.height(25.dp))
-
+        /** Start of Race examples Card
+         */
+        Divider(
+            modifier = Modifier.fillMaxWidth(),
+            thickness = 3.dp,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.height(15.dp))
+        Text(
+            text = "Race equivalent",
+            style = MaterialTheme.typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.height(15.dp))
         OutlinedCard(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
@@ -264,57 +510,58 @@ fun VdotShowResultsContent(
                 }
                 Column(modifier = Modifier.padding(10.dp)) {
                     Text(text = "Time", color = MaterialTheme.colorScheme.primary)
+
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.raceTimes.distanceMarathon.toString(),
+                        text = dataStorePace.raceTimes.distanceMarathon.getRunningTime(),
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.raceTimes.distanceHalfMarathon.toString(),
+                        text = dataStorePace.raceTimes.distanceHalfMarathon.getRunningTime(),
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.raceTimes.distanceFiveteenk.toString(),
+                        text = dataStorePace.raceTimes.distanceFiveteenk.getRunningTime(),
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.raceTimes.distanceTenk.toString(),
+                        text = dataStorePace.raceTimes.distanceTenk.getRunningTime(),
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.raceTimes.distanceFivek.toString(),
+                        text = dataStorePace.raceTimes.distanceFivek.getRunningTime(),
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.raceTimes.distanceTwoMiles.toString(),
+                        text = dataStorePace.raceTimes.distanceTwoMiles.getRunningTime(),
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.raceTimes.distanceThreek.toString(),
+                        text = dataStorePace.raceTimes.distanceThreek.getRunningTime(),
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.raceTimes.distanceOnemile.toString(),
+                        text = dataStorePace.raceTimes.distanceOnemile.getRunningTime(),
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.raceTimes.distanceOnefivem.toString(),
+                        text = dataStorePace.raceTimes.distanceOnefivem.getRunningTime(),
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -324,63 +571,66 @@ fun VdotShowResultsContent(
                     Text(text = "Pace", color = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.racePace.distanceMarathon.toString(),
+                        text = dataStorePace.racePace.distanceMarathon,
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.racePace.distanceHalfMarathon.toString(),
+                        text = dataStorePace.racePace.distanceHalfMarathon,
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.racePace.distanceFiveteenk.toString(),
+                        text = dataStorePace.racePace.distanceFiveteenk,
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.racePace.distanceTenk.toString(),
+                        text = dataStorePace.racePace.distanceTenk,
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.racePace.distanceFivek.toString(),
+                        text = dataStorePace.racePace.distanceFivek,
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.racePace.distanceTwoMiles.toString(),
+                        text = dataStorePace.racePace.distanceTwoMiles,
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.racePace.distanceThreek.toString(),
+                        text = dataStorePace.racePace.distanceThreek,
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.racePace.distanceOnemile.toString(),
+                        text = dataStorePace.racePace.distanceOnemile,
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = dataStorePace.racePace.distanceOnefivem.toString(),
+                        text = dataStorePace.racePace.distanceOnefivem,
                         style = MaterialTheme.typography.titleMedium,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
             }
         }
-
     }
+}
+
+private fun Int.getRunningTime(): String {
+    return DateUtils.formatElapsedTime(this.toLong())
 }
 
 

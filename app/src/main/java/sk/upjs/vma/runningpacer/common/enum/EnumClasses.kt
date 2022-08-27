@@ -28,18 +28,17 @@ enum class OrderByEnum(val type: String, var mutableState: MutableState<Boolean>
 }
 
 enum class CalculatorOptions(val type: String, var mutableState: MutableState<Boolean>?) {
-    TRAINING("Training", null),
-    RACE("Race", null)
+    ENTRY("Calculator", null)
 }
 
-enum class DistanceOptions(val type: String) {
-    MARATHON("Marathon"),
-    HALF_MARATHON("Half marathon"),
-    FIFTEENK("15K"),
-    TENK("10K"),
-    FIVEK("5K"),
-    TWOMILES("2Mi"),
-    THREEK("3K"),
-    ONEMILE("1Mi"),
-    ONEFIVEM("1500M")
+enum class DistanceOptions(val type: String, val length: Double) {
+    MARATHON("Marathon", 42.195),
+    HALF_MARATHON("Half marathon", 21.0975),
+    FIFTEENK("15K", 15.0),
+    TENK("10K", 10.0),
+    FIVEK("5K", 5.0),
+    TWOMILES("2Mi", 3.218688),
+    THREEK("3K", 3.0),
+    ONEMILE("1Mi", 1.609344),
+    ONEFIVEM("1500M", 1.5)
 }

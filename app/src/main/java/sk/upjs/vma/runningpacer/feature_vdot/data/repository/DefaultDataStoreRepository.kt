@@ -1,46 +1,38 @@
 package sk.upjs.vma.runningpacer.feature_vdot.data.repository
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.RacePace
 import sk.upjs.vma.runningpacer.feature_vdot.domain.model.RaceTimes
-import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TableData
+import sk.upjs.vma.runningpacer.feature_vdot.domain.model.RaceTableData
+import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TrainingTableData
 import sk.upjs.vma.runningpacer.feature_vdot.domain.repository.DataRepository
 import javax.inject.Inject
 
 
 class DefaultDataStoreRepository @Inject constructor(
-    private val dataStore: DataStore<TableData>
+    private val raceDataStore: DataStore<RaceTableData>,
+    private val trainingDataStore: DataStore<TrainingTableData>
 ) : DataRepository {
 
-    override suspend fun setRaceDistances(distance: TableData) {
-        dataStore.updateData {
+    override suspend fun setRacePace(raceTableData: RaceTableData) {
+        raceDataStore.updateData {
             it.copy(
-                racePace = RacePace(
-                    distance.racePace.distanceMarathon,
-                    distance.racePace.distanceHalfMarathon,
-                    distance.racePace.distanceFiveteenk,
-                    distance.racePace.distanceTenk,
-                    distance.racePace.distanceFivek,
-                    distance.racePace.distanceTwoMiles,
-                    distance.racePace.distanceThreek,
-                    distance.racePace.distanceOnemile,
-                    distance.racePace.distanceOnefivem
-                ),
-                raceTimes = RaceTimes(
-                    distance.raceTimes.distanceMarathon,
-                    distance.raceTimes.distanceHalfMarathon,
-                    distance.raceTimes.distanceFiveteenk,
-                    distance.raceTimes.distanceTenk,
-                    distance.raceTimes.distanceFivek,
-                    distance.raceTimes.distanceTwoMiles,
-                    distance.raceTimes.distanceThreek,
-                    distance.raceTimes.distanceOnemile,
-                    distance.raceTimes.distanceOnefivem
-                ),
-                vdot = distance.vdot
+                racePace = raceTableData.racePace,
+                raceTimes = raceTableData.raceTimes
             )
         }
-        Log.v("setRaceDistances", "Saved")
+    }
+
+    override suspend fun setTrainingPace(trainingTableData: TrainingTableData) {
+        trainingDataStore.updateData {
+            it.copy(
+                vdotType = trainingTableData.vdotType,
+                marathonType = trainingTableData.marathonType,
+                easyType = trainingTableData.easyType,
+                relayType = trainingTableData.relayType,
+                intervalType = trainingTableData.intervalType,
+                thresholdType = trainingTableData.thresholdType
+            )
+        }
     }
 }

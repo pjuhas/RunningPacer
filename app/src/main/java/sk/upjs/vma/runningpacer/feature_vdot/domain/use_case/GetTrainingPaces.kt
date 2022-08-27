@@ -1,35 +1,41 @@
 package sk.upjs.vma.runningpacer.feature_vdot.domain.use_case
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import sk.upjs.vma.runningpacer.common.enum.OrderByEnum
-import sk.upjs.vma.runningpacer.common.enum.OrderTypeEnum
-import sk.upjs.vma.runningpacer.feature_vdot.domain.model.TrainingPace
-import sk.upjs.vma.runningpacer.feature_vdot.domain.repository.TrainingPaceRepository
+import sk.upjs.vma.runningpacer.feature_vdot.domain.model.*
+import sk.upjs.vma.runningpacer.feature_vdot.domain.repository.DataRepository
 
-class GetTrainingPaces(private val repository: TrainingPaceRepository) {
-
-    operator fun invoke(
-        orderType: OrderTypeEnum = OrderTypeEnum.DESCENDING,
-        orderBy: OrderByEnum = OrderByEnum.DATE
-    ): Flow<List<TrainingPace>> {
-        return repository.getTrainingPaces().map { trainingPaces ->
-            when (orderType) {
-                OrderTypeEnum.ASCENDING -> {
-                    when (orderBy) {
-                        OrderByEnum.DISTANCE -> trainingPaces.sortedBy { it.distance }
-                        OrderByEnum.DATE -> trainingPaces.sortedBy { it.timestamp }
-                        OrderByEnum.TIME -> trainingPaces.sortedBy { it.time }
-                    }
-                }
-                OrderTypeEnum.DESCENDING -> {
-                    when (orderBy) {
-                        OrderByEnum.DISTANCE -> trainingPaces.sortedByDescending { it.distance }
-                        OrderByEnum.DATE -> trainingPaces.sortedByDescending { it.timestamp }
-                        OrderByEnum.TIME -> trainingPaces.sortedByDescending { it.time }
-                    }
-                }
+class GetTrainingPaces(private val repository: DataRepository) {
+    suspend operator fun invoke(
+        vdot: Int,
+        listOfTrainingTimes: TrainingTimesList,
+    ) {
+        var trainingObject = TrainingTableData()
+        for (i in 0 until listOfTrainingTimes.vdotTypeList.size) {
+            if (listOfTrainingTimes.vdotTypeList[i].vdot == vdot) {
+                trainingObject = TrainingTableData(
+                    vdotType = VdotType(listOfTrainingTimes.vdotTypeList[i].vdot),
+                    easyType = EasyType(listOfTrainingTimes.easyTypeList[i].distanceKm),
+                    marathonType = MarathonType(listOfTrainingTimes.marathonTypeList[i].distanceKm),
+                    thresholdType = ThresholdType(
+                        listOfTrainingTimes.thresholdTypeList[i].distanceKm,
+                        listOfTrainingTimes.thresholdTypeList[i].distanceFourm
+                    ),
+                    intervalType = IntervalType(
+                        distanceMile = listOfTrainingTimes.intervalTypeList[i].distanceMile,
+                        distanceOnetwom = listOfTrainingTimes.intervalTypeList[i].distanceOnetwom,
+                        distanceKm = listOfTrainingTimes.intervalTypeList[i].distanceKm,
+                        distanceFourm = listOfTrainingTimes.intervalTypeList[i].distanceFourm
+                    ),
+                    relayType = RelayType(
+                        distanceTwom = listOfTrainingTimes.relayTypeList[i].distanceTwom,
+                        distanceThreem = listOfTrainingTimes.relayTypeList[i].distanceThreem,
+                        distanceFourm = listOfTrainingTimes.relayTypeList[i].distanceFourm,
+                        distanceSixm = listOfTrainingTimes.relayTypeList[i].distanceSixm,
+                        distanceEightm = listOfTrainingTimes.relayTypeList[i].distanceEightm
+                    )
+                )
+                break
             }
         }
+        repository.setTrainingPace(trainingObject)
     }
 }
